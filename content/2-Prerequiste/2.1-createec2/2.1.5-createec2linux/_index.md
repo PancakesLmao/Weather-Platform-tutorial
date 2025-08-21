@@ -1,6 +1,5 @@
 ---
 title : "Create Public instance"
-date : "`r Sys.Date()`"
 weight : 5
 chapter : false
 pre : " <b> 2.1.5 </b> "

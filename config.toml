@@ -1,6 +1,16 @@
 # Change the default theme to be use when building the site with Hugo
 theme = "hugo-theme-learn"
 
+# Enable Git info for automatic last modified dates
+enableGitInfo = true
+
+# Date format configuration
+[frontmatter]
+date = ["date", "publishDate", "lastmod"]
+lastmod = ["lastmod", ":git", "date", "publishDate"]
+publishDate = ["publishDate", "date"]
+expiryDate = ["expiryDate"]
+
 # For search functionality
 [outputs]
 home = [ "HTML", "RSS", "JSON"]
@@ -10,8 +20,8 @@ home = [ "HTML", "RSS", "JSON"]
   themeVariant = "workshop"
   # Git hub repo link
   editURL = ""
-  description = ""  
-  author = "holehuy.it@gmail.com"
+  description = ""
+  author = "phucthin29@gmail.com"
   showVisitedLinks = true
   disableBreadcrumb = false
   disableNextPrev = false
@@ -19,7 +29,7 @@ home = [ "HTML", "RSS", "JSON"]
 
 [Languages]
 [Languages.en]
-title = "Deploy Hugo Website with AWS CI/CD Tools"
+title = "Build a weather platform using AWS Serverless Services"
 weight = 1
 languageName = "English"
 
@@ -30,7 +40,7 @@ url = "https://www.facebook.com/groups/awsstudygroupfcj/"
 weight = 20
 
 [Languages.vi]
-title = "Triển khai Hugo Website với bộ công cụ CICD của AWS"
+title = "Xây dựng một nền tảng quản lí trạm thời tiết bằng các dịch vụ serverless của AWS"
 weight = 2
 languageName = "Tiếng Việt"
 

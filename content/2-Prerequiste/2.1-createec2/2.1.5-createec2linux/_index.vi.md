@@ -1,6 +1,5 @@
 ---
 title : "Tạo Public Linux EC2"
-date :  "`r Sys.Date()`" 
 weight : 5
 chapter : false
 pre : " <b> 2.1.5 </b> "

@@ -1,6 +1,5 @@
 ---
 title : "Tạo Private Windows EC2"
-date :  "`r Sys.Date()`" 
 weight : 6
 chapter : false
 pre : " <b> 2.1.6 </b> "

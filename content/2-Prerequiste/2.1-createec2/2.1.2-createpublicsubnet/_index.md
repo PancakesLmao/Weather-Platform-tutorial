@@ -1,6 +1,5 @@
 ---
 title : "Create Public Subnet"
-date : "`r Sys.Date()`"
 weight : 2
 chapter : false
 pre : " <b> 2.1.2 </b> "
