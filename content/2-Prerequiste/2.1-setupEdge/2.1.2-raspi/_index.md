@@ -13,19 +13,11 @@ In this section, we'll configure the Raspberry Pi to act as a gateway device tha
 Your Raspberry Pi must be model 3B or higher to run the provided source code effectively.
 {{% /notice %}}
 
-### Required Components
-
-- Raspberry Pi (Model 3B or higher)
-- MicroSD card (32GB or higher)
-- Power supply
-- Network connection (WiFi or Ethernet)
-
 ### Step 1: Install Raspberry Pi OS
 
-1. **Download Raspberry Pi Imager** from the >> [Official website](https://www.raspberrypi.com/software/)
-2. Open Raspberry Pi Imager, plug in the MicroSD card and **flash the OS** to your card. You can use any OS, I'm using Ubuntu Server, but if you are new to Raspberry Pi, I suggest use RaspiOS, it's simple and beginner friendly
-3. **Enable SSH**: This one is important, would need to tick the box for this option
-4. **Configure Wifi**: The software will ask you to type in your current SSID and password in order to connect to the internet
+1. Open **Raspberry Pi Imager**, plug in the MicroSD card and **flash the OS**. You can use any OS, I'm using Ubuntu Server, but if you are new to Raspberry Pi, I recommend **Raspberry Pi OS (RaspiOS)**, it's simple and beginner friendly
+2. **Enable SSH**: This one is important, make sure you tick the box for this option
+3. **Configure Wifi**: Enter your SSID and password so your Pi can connect to the internet on first boot
 
 ### Step 2: Initial Setup
 
@@ -50,11 +42,10 @@ Your Raspberry Pi must be model 3B or higher to run the provided source code eff
    ```
 
 3. **Install required software/tools**:
-   ```bash
-   
-   ```
-   >>  
-   >>
+  - Git
+  - [Docker](https://docs.docker.com/engine/install/debian/)
+  - [Nginx](https://techworldthink.github.io/Tech-Guides/pages/nginx_pi.html)
+  - [Tailscale](https://tailscale.com/kb/1031/install-linux) (Or you can use WireGuard)
 
 ### Step 3: Configure Edge station
 
@@ -73,7 +64,18 @@ Your Raspberry Pi must be model 3B or higher to run the provided source code eff
   INFLUXDB_TOKEN=<your_token_here>
   ```
 
-### Step 4: Test the Setup
+### Step 4: Configure Device Certificates
+{{% notice warning %}}
+Comeback to this step after you finish [setup Cloud Environment](../2.2-setupCloud/)
+{{% /notice %}}
+
+1. **Register device** in the Weather Platform dashboard
+2. **Download certificates** (certificate.pem.crt, private.pem.key, AmazonRootCA1.pem)
+4. **Update the code** with your certificates and IoT endpoint
+
+You must insert all credential files inside `/data-processor/credentials/` folder in order to publish data onto weather platform
+
+### Step 5: Test the Setup
 
 1. **Run the edge station again**:
 
@@ -86,6 +88,7 @@ Your Raspberry Pi must be model 3B or higher to run the provided source code eff
    docker compose ps
    docker compose logs weather-edge-processor
    ```
+**Verify data** appears in the dashboard
 
 {{% notice tip %}}
 Make sure your Raspberry Pi has a stable internet connection for reliable data transmission.

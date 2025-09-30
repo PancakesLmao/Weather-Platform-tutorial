@@ -5,278 +5,126 @@ chapter: false
 pre: " <b> 3. </b> "
 ---
 
-In this section, we'll set up the data lake infrastructure for storing and processing weather data. The Weather Platform uses Amazon S3 as the primary data lake, with AWS Glue for data cataloging and ETL operations, and CloudFront for global data distribution.
+## S3 Data Lake for IoT Messages
+
+The Weather Platform uses Amazon S3 as a simple data lake to store IoT messages from weather sensors. This is the primary storage for raw sensor data.
+
+### What is the Data Lake?
+
+The data lake is an S3 bucket named `itea-weather-data-lake-storage` that stores:
+
+- Raw IoT sensor messages (JSON format)
+- AWS Glue ETL scripts for data processing
+
+### Data Lake Bucket Structure
+
+The data lake is organized with the following folder structure:
+
+```
+itea-weather-data-lake-storage/
+├── raw-data/                   # Raw IoT sensor messages
+│   └── weatherPlatform/        # Weather platform data
+│       └── telemetry/          # Telemetry data organized by location
+│           ├── {location-1}/   # e.g., "itea-lab-room-a"
+│           │   └── sensor-data.json
+│           ├── {location-2}/   # e.g., "outdoor-station-1"
+│           │   └── sensor-data.json
+│           └── {location-n}/   # Additional locations
+│               └── sensor-data.json
+└── glue-scripts/               # AWS Glue ETL scripts
+    └── weather-transform.py    # Data transformation script
+```
+
+### IoT Message Storage
+
+When IoT devices send weather data, the messages are stored in:
+
+```
+raw-data/weatherPlatform/telemetry/{location}/
+```
+
+Where `{location}` is the specific location identifier (e.g., `itea-lab-room-a`, `outdoor-station-1`).
+
+### Setup
+
+If you want to create the data lake bucket manually for learning:
+
+1. **Go to S3 Console**: https://console.aws.amazon.com/s3/
+2. **Click "Create bucket"**
+3. **Configure settings**:
+
+   - **Bucket name**: `itea-weather-data-lake-storage-yourname` (must be globally unique)
+   - **Region**: Same as your Amplify deployment region
+   - **Block Public Access**: Keep enabled for security
+   - **Versioning**: Optional (disabled by default)
+
+4. **Create folder structure**:
+   ```bash
+   # Create the required folder structure
+   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/
+   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/weatherPlatform/
+   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/weatherPlatform/telemetry/
+   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key glue-scripts/
+   ```
+
+### Important Notes
+
+{{% notice warning %}}
+**Critical**: S3 bucket names must be globally unique across all AWS accounts. Add your name or timestamp to ensure uniqueness: `itea-weather-data-lake-storage-yourname`
+
+**Backend Code Update Required**: The Amplify backend code has hardcoded bucket names that must be updated to match your unique bucket name.
+{{% /notice %}}
 
 {{% notice info %}}
-The data lake architecture is automatically deployed as part of the Amplify backend, but understanding its components helps with customization and troubleshooting.
+This data lake bucket is separate from the processed dataset bucket. Raw IoT sensor data flows into this bucket, while processed datasets are stored in a different bucket.
 {{% /notice %}}
 
-![Data Lake Architecture](/images/data-lake-architecture.png)
+### Update Backend Code
 
-## Data Lake Components
+After creating your unique bucket name, you **must** update the hardcoded references in the Amplify backend:
 
-### Amazon S3 Storage Structure
+**Files to Update:**
 
-The platform organizes data in S3 with the following structure:
+1. **`amplify/backend.ts`** (Lines 233, 272, 273, 318):
 
-```
-weather-platform-bucket/
-├── raw-data/                    # Raw IoT sensor data
-│   ├── year=2024/
-│   │   ├── month=01/
-│   │   │   ├── day=15/
-│   │   │   │   └── device-01/
-│   │   │   │       └── telemetry.json
-├── processed-data/              # Processed datasets
-│   ├── daily-summaries/
-│   │   └── 2024-01-15.csv
-│   ├── monthly-reports/
-│   │   └── 2024-01.csv
-├── datasets/                    # Public datasets via CloudFront
-│   ├── latest/
-│   │   └── weather-data.csv
-│   └── historical/
-│       └── 2024/
-└── glue-scripts/               # ETL job scripts
-    └── weather-data-transform.py
-```
+   ```typescript
+   // Change from:
+   sourceBucketName: "itea-weather-data-lake-storage";
 
-### AWS Glue Data Catalog
+   // To your unique name:
+   sourceBucketName: "itea-weather-data-lake-storage-yourname";
+   ```
 
-The Glue Data Catalog automatically discovers and catalogs your weather data:
+2. **`amplify/functions/getTotalReadings/handler.ts`** (Line 16):
 
-- **Database**: `weather_platform_db`
-- **Tables**: Automatically created from S3 data
-- **Schemas**: Inferred from JSON sensor data
-- **Partitions**: Organized by year/month/day for efficient querying
+   ```typescript
+   // Change from:
+   const bucket = "itea-weather-data-lake-storage";
 
-### CloudFront Distribution
+   // To your unique name:
+   const bucket = "itea-weather-data-lake-storage-yourname";
+   ```
 
-Global CDN for fast dataset access:
+3. **`amplify/custom/WeatherDataGlue/resource.ts`** (Lines 65, 66, 195):
 
-- **Origin**: S3 datasets folder
-- **Caching**: Optimized for CSV file downloads
-- **Global Edge Locations**: Reduced latency worldwide
-- **Custom Domain**: Optional custom domain support
+   ```typescript
+   // Change all S3 ARNs and paths from:
+   arn:aws:s3:::itea-weather-data-lake-storage
+   s3://itea-weather-data-lake-storage/glue-scripts/
 
-## Data Processing Pipeline
-
-### Step Functions Workflow
-
-The platform uses AWS Step Functions to orchestrate data processing:
-
-```json
-{
-  "Comment": "Weather Data Processing Pipeline",
-  "StartAt": "RunGlueCrawler",
-  "States": {
-    "RunGlueCrawler": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
-      "Parameters": {
-        "Name": "weather-data-crawler"
-      },
-      "Next": "WaitForCrawler"
-    },
-    "WaitForCrawler": {
-      "Type": "Wait",
-      "Seconds": 60,
-      "Next": "CheckCrawlerStatus"
-    },
-    "CheckCrawlerStatus": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
-      "Parameters": {
-        "Name": "weather-data-crawler"
-      },
-      "Next": "IsCrawlerComplete"
-    },
-    "IsCrawlerComplete": {
-      "Type": "Choice",
-      "Choices": [
-        {
-          "Variable": "$.Crawler.State",
-          "StringEquals": "READY",
-          "Next": "RunETLJob"
-        }
-      ],
-      "Default": "WaitForCrawler"
-    },
-    "RunETLJob": {
-      "Type": "Task",
-      "Resource": "arn:aws:states:::glue:startJobRun.sync",
-      "Parameters": {
-        "JobName": "weather-data-etl"
-      },
-      "End": true
-    }
-  }
-}
-```
-
-### EventBridge Scheduling
-
-Automated daily processing at midnight UTC+7:
-
-```json
-{
-  "ScheduleExpression": "cron(0 17 * * ? *)",
-  "Description": "Daily weather data processing",
-  "State": "ENABLED",
-  "Targets": [
-    {
-      "Id": "WeatherDataProcessing",
-      "Arn": "arn:aws:states:region:account:stateMachine:weather-data-pipeline",
-      "RoleArn": "arn:aws:iam::account:role/EventBridgeStepFunctionsRole"
-    }
-  ]
-}
-```
-
-## Data Formats and Schemas
-
-### Raw Sensor Data (JSON)
-
-IoT devices send data in this format:
-
-```json
-{
-  "deviceId": "weather-station-01",
-  "timestamp": "2024-01-15T10:30:00Z",
-  "location": {
-    "latitude": 10.8231,
-    "longitude": 106.6297,
-    "name": "ITea Lab - Room A"
-  },
-  "sensors": {
-    "temperature": {
-      "value": 28.5,
-      "unit": "celsius"
-    },
-    "humidity": {
-      "value": 65.2,
-      "unit": "percent"
-    },
-    "pressure": {
-      "value": 1013.25,
-      "unit": "hPa"
-    },
-    "wind": {
-      "speed": 5.2,
-      "direction": 180,
-      "unit": "m/s"
-    },
-    "rainfall": {
-      "value": 0.0,
-      "unit": "mm"
-    }
-  },
-  "metadata": {
-    "firmware_version": "1.2.3",
-    "battery_level": 85,
-    "signal_strength": -45
-  }
-}
-```
-
-### Processed Dataset (CSV)
-
-ETL jobs transform raw data into structured CSV format:
-
-```csv
-timestamp,device_id,location_name,temperature_c,humidity_pct,pressure_hpa,wind_speed_ms,wind_direction_deg,rainfall_mm,battery_level,signal_strength
-2024-01-15T10:30:00Z,weather-station-01,ITea Lab - Room A,28.5,65.2,1013.25,5.2,180,0.0,85,-45
-2024-01-15T10:35:00Z,weather-station-01,ITea Lab - Room A,28.7,64.8,1013.20,5.5,185,0.0,85,-44
-```
-
-## Manual S3 Setup (Optional)
-
-While Amplify creates the S3 bucket automatically, you can also set it up manually for learning purposes:
-
-### Step 1: Create S3 Bucket
-
-1. Go to [S3 Console](https://console.aws.amazon.com/s3/)
-2. Click **"Create bucket"**
-3. Configure bucket settings:
-   - **Bucket name**: `weather-platform-data-lake-[unique-id]`
-   - **Region**: Same as your Amplify deployment
-   - **Block Public Access**: Keep enabled for security
-   - **Versioning**: Enable for data protection
-
-### Step 2: Configure Bucket Structure
-
-Create the folder structure using AWS CLI:
-
-```bash
-# Create folder structure
-aws s3api put-object --bucket weather-platform-data-lake-[unique-id] --key raw-data/ --profile weather-platform
-aws s3api put-object --bucket weather-platform-data-lake-[unique-id] --key processed-data/ --profile weather-platform
-aws s3api put-object --bucket weather-platform-data-lake-[unique-id] --key datasets/ --profile weather-platform
-aws s3api put-object --bucket weather-platform-data-lake-[unique-id] --key glue-scripts/ --profile weather-platform
-```
-
-### Step 3: Set Up Lifecycle Policies
-
-Configure automatic data archival:
-
-```json
-{
-  "Rules": [
-    {
-      "ID": "WeatherDataLifecycle",
-      "Status": "Enabled",
-      "Filter": {
-        "Prefix": "raw-data/"
-      },
-      "Transitions": [
-        {
-          "Days": 30,
-          "StorageClass": "STANDARD_IA"
-        },
-        {
-          "Days": 90,
-          "StorageClass": "GLACIER"
-        },
-        {
-          "Days": 365,
-          "StorageClass": "DEEP_ARCHIVE"
-        }
-      ]
-    }
-  ]
-}
-```
-
-## Monitoring and Optimization
-
-### CloudWatch Metrics
-
-Key metrics to monitor:
-
-- **S3 Storage Usage**: Track data growth over time
-- **Glue Job Duration**: Monitor ETL performance
-- **CloudFront Cache Hit Ratio**: Optimize global access
-- **Data Processing Errors**: Track failed transformations
-
-### Cost Optimization
-
-- **S3 Intelligent Tiering**: Automatic cost optimization
-- **Glue Job Scheduling**: Process data during off-peak hours
-- **CloudFront Caching**: Reduce S3 request costs
-- **Data Lifecycle Policies**: Archive old data to Glacier
+   // To your unique name:
+   arn:aws:s3:::itea-weather-data-lake-storage-yourname
+   s3://itea-weather-data-lake-storage-yourname/glue-scripts/
+   ```
 
 {{% notice tip %}}
-The data lake infrastructure scales automatically with your data volume. Start with the default configuration and optimize based on your specific usage patterns.
+Use Find & Replace in your code editor to quickly update all instances of `itea-weather-data-lake-storage` to your unique bucket name.
 {{% /notice %}}
 
-## Next Steps
+### Next Steps
 
-With the data lake configured, you can:
+With the S3 data lake configured:
 
-1. **Monitor data ingestion** from IoT devices
-2. **Customize ETL transformations** for specific analytics needs
-3. **Set up data quality checks** to ensure data integrity
-4. **Create custom datasets** for specific research requirements
-5. **Integrate with BI tools** like Amazon QuickSight for advanced analytics
-
-The data lake provides a solid foundation for scalable weather data analytics and research applications.
+- IoT devices send messages that get stored in `raw-data/weatherPlatform/telemetry/{location}/`
+- AWS Glue scripts in `glue-scripts/` process the raw data
+- Processed results are stored in a separate dataset bucket

@@ -5,34 +5,60 @@ chapter : false
 pre : " <b> 2.2 </b> "
 ---
 
-### Create IAM Role
+In this step, we'll set up the environment to interact with AWS resources from the developer's terminal using AWS CLI
 
-In this step, we will proceed to create IAM Role. In this IAM Role, the policy **AmazonSSMManagedInstanceCore** will be assigned, this is the policy that allows the EC2 server to communicate with the Session Manager.
+## AWS Account Setup
 
-1. Go to [IAM service administration interface](https://console.aws.amazon.com/iamv2/)
-2. In the left navigation bar, click **Roles**.
+### Step 1: AWS Account Requirements
 
-![role](/images/2.prerequisite/038-iamrole.png)
+- You will first need an AWS Account with appropriate permissions
+- Give it access to create IAM users and policies
+- Billing alerts configured (recommended)
 
-3. Click **Create role**.
+### Step 2: Create IAM User for Development
 
-![role1](/images/2.prerequisite/039-iamrole.png)
+1. **Go to AWS Console** → IAM → Users → "Create user"
 
-4. Click **AWS service** and click **EC2**.
-  + Click **Next: Permissions**.
+2. **User details:**
 
-![role1](/images/2.prerequisite/40-iamrole.png)
+   - Username: `ws1-amplify`
+   - Select "Provide user access to the AWS Management Console" if needed
 
-5. In the Search box, enter **AmazonSSMManagedInstanceCore** and press Enter to search for this policy.
-  + Click the policy **AmazonSSMManagedInstanceCore**.
-  + Click **Next: Tags.**
+3. **Set permissions:**
 
-![createpolicy](/images/2.prerequisite/041-iamrole.png)
+   - Choose "Attach policies directly"
+   - Add these managed policies:
+     - `AmplifyBackendDeployFullAccess` (for deploying Amplify backend resources)
+     - `AWSCloudFormationReadOnlyAccess` (to check resource creation and debug stack builds)
+     - `IAMFullAccess` (to manage IAM policies and verify permissions)
+     - `AWSIoTFullAccess` (for IoT Core interactions via CLI and attaching IoT policies)
 
-6. Click **Next: Review**.
-7. Name the Role **SSM-Role** in Role Name
-  + Click **Create Role** \.
+4. **Create Access Keys:**
+   - Go to user → Security credentials → "Create access key"
+   - Choose "Command Line Interface (CLI)"
+   - Save the **Access Key ID** and **Secret Access Key**
 
-![namerole](/images/2.prerequisite/042-iamrole.png)
+{{% notice warning %}}
+Store your AWS credentials securely and never commit them to version control!
+{{% /notice %}}
 
-Next, we will make the connection to the EC2 servers we created with **Session Manager**.
+### Step 3: Configure AWS CLI Profile
+
+Set up a named profile for this project:
+
+```bash
+# Configure AWS CLI with your profile
+aws configure --profile weather-platform
+
+# Enter when prompted:
+# AWS Access Key ID: [your-access-key-id]
+# AWS Secret Access Key: [your-secret-access-key]
+# Default region name: us-east-1 (or your preferred region)
+# Default output format: json
+```
+
+Verify the profile:
+
+```bash
+aws sts get-caller-identity --profile weather-platform
+```
