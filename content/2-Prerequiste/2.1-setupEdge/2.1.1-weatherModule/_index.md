@@ -6,7 +6,7 @@ pre: " <b> 2.1.1 </b> "
 ---
 
 ### 1. Connect SEN0186 TO ESP32
-![Wiring diagram](/images/2.prerequisite/setupEdge/wiring.png)
+![Wiring diagram](/images/2.prerequisite/2.1-setupEdge/wiring.png)
 
 **Wiring Diagram:**
 
@@ -18,7 +18,11 @@ TX           |  SEN1086       |  RX
 RX           |  SEN1086       |  TX
 GND          |  SEN1086       |  GND
 ```
-
+{{% notice info %}}
+Depends on the sensors you use, the wiring diagram may vary. Please refer to the sensor's datasheet for accurate wiring instructions.
+Also refer to your ESP32 model pinout diagram to avoid using reserved pins. They are called Device GPIO.
+{{% /notice %}}
+![GPIO diagram](/images/2.prerequisite/2.1-setupEdge/wrover_e_GPIO.jpg)
 ### 2. Upload code to ESP32
 Create a new Arduino sketch with the code below (for ESP32 Wrover-E) or use your own code:
 

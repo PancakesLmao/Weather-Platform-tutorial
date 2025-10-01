@@ -56,10 +56,13 @@ In order to upload code into ESP32, you would need to download CH340 / CP210x dr
 Download >> [CH340 Driver](https://sparks.gogo.co.nz/ch340.html?srsltid=AfmBOoqw56vghnvmBvcnyxgdozmHKAL6zkRtUcDfAHQ9vE3_kJ55k_Gj)  
 Download >> [CP210x Windows Drivers v6.7.6](https://www.silabs.com/software-and-tools/usb-to-uart-bridge-vcp-drivers?tab=downloads)
 3. Install ESP32 board support:
-   - Go to **File** → **Preferences**
-   - Add URL: `https://dl.espressif.com/dl/package_esp32_index.json`
    - Go to **Tools** → **Board** → **Boards Manager**
    - Search "ESP32" and install
+   ![Install Board Support](/images/2.prerequisite/2.1-setupEdge/1.png)
+   
+{{% notice info %}}
+Depends on the ESP32 model you use, you only need to install the board support specially for your model to reduce unnecessary packages.
+{{% /notice %}}
 
 4. Install these libraries via **Library Manager**:
 
@@ -67,13 +70,18 @@ Download >> [CP210x Windows Drivers v6.7.6](https://www.silabs.com/software-and-
 - WiFi (built-in)
 - PubSubClient (for MQTT)
 - ArduinoJson
-- Adafruit BMP280 Library
-- NTPClient (for time synchronization)
+- U8g2 (for OLED display, optional. You can you different library if your OLED screen is not SSD1306)
+- SoftwareSerial (In case your ESP32 model does not have enough UART ports or broken pins)
 ```
+![Install Library](/images/2.prerequisite/2.1-setupEdge/2.png)
+![Install Library](/images/2.prerequisite/2.1-setupEdge/3.png)
+![Install Library](/images/2.prerequisite/2.1-setupEdge/4.png)
+![Install Library](/images/2.prerequisite/2.1-setupEdge/5.png)
 
 ### Raspeberry Pi Imager
 Download [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+![Install Raspberry Pi Imager](/images/2.prerequisite/2.1-setupEdge/6.png)
 
 ## Next Steps
->> [Setup Weather Module](2.1-setupedge/2.1.1-weatherModule)  
->> [Setup Raspberry Pi](2.1-setupedge/2.1.2-raspi)
+>> [Setup Weather Module](/2-prerequiste/2.1-setupedge/2.1.1-weatherModule)  
+>> [Setup Raspberry Pi](/2-prerequiste/2.1-setupedge/2.1.2-raspi)
