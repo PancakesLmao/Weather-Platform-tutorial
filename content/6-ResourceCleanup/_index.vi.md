@@ -9,7 +9,7 @@ pre: " <b> 6. </b> "
 
 Dọn dẹp đúng cách tất cả resources của Weather Platform để tránh chi phí không cần thiết. Infrastructure dựa trên CloudFormation của Amplify giúp việc cleanup đơn giản với các lệnh đơn giản.
 
-### Lệnh Cleanup Nhanh
+### Lệnh cleanup nhanh
 
 #### Đối với môi trường Development Sandbox
 
@@ -38,7 +38,7 @@ npx ampx pipeline-deploy --branch main --appId <your-app-id> --delete --profile 
 - EventBridge rules
 - IAM roles và policies được tạo bởi Amplify
 
-### Cleanup Thủ công
+### Cleanup thủ công
 
 Một số resources có thể cần xóa thủ công:
 
@@ -64,7 +64,7 @@ aws s3 rm s3://itea-weather-data-lake-storage-yourname --recursive --profile ws1
 aws s3 rb s3://itea-weather-data-lake-storage-yourname --profile ws1-amplify
 ```
 
-### Các bước Xác minh
+### Các bước xác minh
 
 Sau khi cleanup, xác minh tất cả resources đã bị xóa:
 
