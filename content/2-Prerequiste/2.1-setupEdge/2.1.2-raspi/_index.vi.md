@@ -1,98 +1,207 @@
 ---
-title : "Tạo Public subnet"
-weight : 2
-chapter : false
-pre : " <b> 2.1.2 </b> "
+title: "Thiết lập Raspberry Pi"
+weight: 2
+chapter: false
+pre: " <b> 2.1.2 </b> "
 ---
 
-#### Tạo Public subnet
+Trong phần này, chúng ta sẽ cấu hình Raspberry Pi để hoạt động như một device gateway thu thập dữ liệu từ ESP32 và chuyển tiếp tới AWS IoT Core.
 
-1. Click **Subnets**.
-  + Click **Create subnet**.
+### Yêu cầu
 
-![VPC](/images/2.prerequisite/003-createsubnet.png)
+{{% notice info %}}
+Raspberry Pi phải là model 3B trở lên để chạy source code một cách hiệu quả.
+{{% /notice %}}
 
-2. Tại trang **Create subnet**.
-  + Tại mục **VPC ID** click chọn **Lab VPC**.
-  + Tại mục **Subnet name** điền **Lab Public Subnet**.
-  + Tại mục **Availability Zone** chọn Availability zone đầu tiên.
-  + Tại mục **IPv4 CIRD block** điền **10.10.1.0/24**.
+### Bước 1: Cài đặt Raspberry Pi OS
 
-![VPC](/images/2.prerequisite/004-createsubnet.png)
+1. Mở **Raspberry Pi Imager**, cắm thẻ MicroSD và **flash OS**. Bạn có thể dùng bất kỳ OS nào, mình đang dùng Ubuntu Server, nhưng nếu bạn là người mới, chưa biết gì về Linux hay Raspberry Pi, mình khuyên dùng **Raspberry Pi OS (RaspiOS)**, nó đơn giản và dễ thao tác, kèm 1 lượng lớn tài liệu/blog hỗ trợ.
+   {{% notice warning %}}
+   Khi bạn chọn storage device, hãy đảm bảo chọn đúng vì tất cả dữ liệu trên thiết bị được chọn sẽ bị xóa.
+   {{% /notice %}}
 
-3. Kéo xuống cuối trang , click **Create subnet**.
+2. **Enable SSH**: Nhớ tíck vào ô cho tùy chọn này
+3. **Configure Wifi**: Nhập SSID và password để Pi có thể kết nối internet ngay lần đầu khởi động
+4. **Set locale settings**: Thiết lập quốc gia, ngôn ngữ và timezone
+5. Nhấp **Save** rồi chọn **Yes** để flash OS lên thẻ MicroSD
+6. Hoàn tất xong, tháo thẻ MicroSD và cắm vào Raspberry Pi. Kết nối nguồn điện để khởi động
 
-4. Click chọn **Lab Public Subnet**.
-  + Click **Actions**.
-  + Click **Edit subnet settings**.
+![Imager Config](/images/2.prerequisite/2.1-setupEdge/imager1.png)
+![Imager Config](/images/2.prerequisite/2.1-setupEdge/imager2.png)
+![Imager Config](/images/2.prerequisite/2.1-setupEdge/imager3.png)
+![Imager Config](/images/2.prerequisite/2.1-setupEdge/imager4.png)
+![Imager Config](/images/2.prerequisite/2.1-setupEdge/imager5.png)
 
-![VPC](/images/2.prerequisite/005-createsubnet.png)
+### Bước 2: Thiết lập ban đầu
 
-5. Click chọn **Enable auto-assign public IPv4 address**.
-  + Click **Save**.
+1. **Khởi động Raspberry Pi** và kết nối qua SSH:
 
-![VPC](/images/2.prerequisite/006-createsubnet.png)
+   ```bash
+   ping -4 raspberrypi.local
+   ```
 
-6. Click **Internet Gateways**.
-  + Click **Create internet gateway**.
-  
-![VPC](/images/2.prerequisite/007-createigw.png)
+   Nếu nó trả về IPv4 address thì ok. Nếu không thì cấu hình wifi ở bước trước chắc sai ở đâu đó rồi.  
+   Có thể do SSID hoặc password không hợp lệ. Bạn có thể:
 
-7. Tại trang **Create internet gateway**.
-  + Tại mục **Name tag** điền **Lab IGW**.
-  + Click **Create internet gateway**.
-  
-![VPC](/images/2.prerequisite/008-createigw.png)
+   1. Flash OS lại
+   2. Dùng cáp LAN kết nối với laptop/PC và đặt IP
 
-8. Sau khi tạo thành công, click **Actions**.
-  + Click **Attach to VPC**.
- 
-![VPC](/images/2.prerequisite/009-createigw.png)
+   ```bash
+   ssh raspberrypi@<raspberry-pi-ip>
+   ```
 
-9. Tại trang **Attach to VPC**.
-  + Tại mục **Available VPCs** chọn **Lab VPC**.
-  + Click **Attach internet gateway**.
-  + Kiểm tra quá trình attach thành công như hình dưới.
+2. **Cập nhật hệ thống**:
 
-![VPC](/images/2.prerequisite/010-createigw.png)
+   ```bash
+   sudo apt update && sudo apt upgrade -y
+   ```
 
-10. Tiếp theo chúng ta sẽ tạo một custom route table để gán vào **Lab Public Subnet**.
-  + Click **Route Tables**.
-  + Click **Create route table**.
+3. **Cài đặt phần mềm/công cụ yêu cầu**:
 
-![VPC](/images/2.prerequisite/011-creatertb.png)
+- Git
+- [Docker](https://docs.docker.com/engine/install/debian/)
+- [Nginx](https://techworldthink.github.io/Tech-Guides/pages/nginx_pi.html)
+- [Tailscale](https://tailscale.com/kb/1031/install-linux) (Hoặc bạn có thể dùng WireGuard)
 
-11. Tại trang **Create route table**.
-  + Tại mục **Name**, điền **Lab Publicrtb**.
-  + Tại mục **VPC**, chọn **Lab VPC**.
-  + Click **Create route table**.
+### Bước 3: Thiết lập VPN với Tailscale trên Laptop và Raspberry Pi
 
-12. Sau khi tạo route table thành công.
-  + Click **Edit routes**.
-  
-![VPC](/images/2.prerequisite/012-creatertb.png)
+VPN cho phép bạn truy cập Raspberry Pi như thể bạn đang ở cùng mạng local—ngay cả từ bất kỳ đâu trên thế giới.
+Có một vài tùy chọn VPN tốt, nhưng mình xài Tailscale vì nó nhanh và cực kỳ dễ thiết lập. Tailscale là VPN được xây dựng trên WireGuard tự động thiết lập mạng mesh bảo mật giữa các thiết bị.  
 
-13. Tại trang **Edit routes**.
-  + Click **Add route**.
-  + Tại mục **Destination** điền 0.0.0.0/0
-  + Tại mục **Target** chọn **Internet Gateway** sau đó chọn **Lab IGW**.
-  + Click **Save changes**.
+1. Vào https://tailscale.com/ và tạo tài khoản > Đăng ký bằng Google / Github (chọn tùy chọn của bạn)
+2. Cài đặt Tailscale client trên thiết bị từ https://tailscale.com/download  
+   Hoàn tất xong, biểu tượng Tailscale sẽ xuất hiện trong system tray  
+   Nhấp chuột phải vào biểu tượng > Đăng nhập bằng thông tin đăng nhập bạn dùng để tạo tài khoản  
+   Tailscale sẽ yêu cầu bạn authorize thiết bị để join tailnet VPN  
+   Nhấp **Connect** > Sau đó bạn sẽ có thể xem thiết bị trên Machines dashboard.
+3. Nếu bạn đã enable SSH trên Raspberry Pi, chuyển sang bước 4. Nếu chưa, làm theo các bước này.  
+   Chạy `sudo raspi-config` để mở Raspberry Pi Configuration Tool Interface  
+   Chọn **Interface Options** > SSH > Yes > Ok
+4. Để cài đặt Tailscale client trên Raspberry Pi, dùng:
 
-![VPC](/images/2.prerequisite/013-creatertb.png)
+```
+sudo apt update
+sudo apt upgrade -y
+curl -fsSL https://tailscale.com/install.sh | sh
+```
 
-14. Click tab **Subnet associations**.
-  + Click **Edit subnet associations** để tiến hành associate custom routable chúng ta vừa tạo vào **Lab Public Subnet**.
+Sau đó khởi động Tailscale bằng:
 
+```
+sudo tailscale up
+```
 
-![VPC](/images/2.prerequisite/014-creatertb.png)
+Bạn có thể tìm Tailscale IPv4 address bằng cách chạy:
 
-15. Tại trang **Edit subnet associations**. 
-  + Click chọn **Lab Public Subnet**.
-  + Click **Save associations**.
+```
+tailscale ip -4
+```
 
-![VPC](/images/2.prerequisite/015-creatertb.png)
+5. Test kết nối
 
-16. Kiểm tra thông tin route table đã được associate với **Lab Public Subnet** và thông tin route đi internet đã được trỏ đến Internet Gateway như hình dưới.
+```
+ssh <pi_username>@<tailscale_ip>
+```
 
+hoặc
+Enable SSH qua Tailscale bằng:
 
-![VPC](/images/2.prerequisite/016-creatertb.png)
+```
+sudo tailscale up --ssh
+```
+
+Điều này cho phép bạn SSH Pi trực tiếp từ browser  
+Vào admin console > Nhấp **Menu option** > SSH to machine
+Nó sẽ yêu cầu thông tin đăng nhập > SSH > Tailscale sẽ mở 1 tab để chạy SSH
+
+### Bước 4: Cấu hình Edge station
+
+```bash
+git clone https://github.com/Itea-Lab/Weather-Edge.git
+cd Weather-Edge
+sudo nano .env
+```
+
+Dán file .env mẫu với thông tin đăng nhập rồi chạy
+
+```bash
+docker compose up --build -d
+```
+
+Bạn sẽ cần mở giao diện của InfluxDB trên browser laptop với `<raspi_tailscale_ip>:8086`, đăng nhập và lấy token
+Khi token được tạo, copy và paste vào file `.env`
+
+```
+INFLUXDB_TOKEN=<your_token_here>
+```
+
+File `.env` hoàn chỉnh sẽ như thế này:
+
+```
+# InfluxDB Configuration
+INFLUXDB_USERNAME=<username>
+INFLUXDB_PASSWORD=your_password
+INFLUXDB_ORG=weather_org
+INFLUXDB_BUCKET=weather_data
+# For Docker containers, use service name
+INFLUXDB_ROUTE=http://database:8086
+# Token will be obtained after InfluxDB initialization (see step 6)
+INFLUXDB_TOKEN=<your_token_here>
+
+# Data Configuration
+DATA_LOCATION=<your_location_name> (district1, district2, etc)
+MEASUREMENT_NAME=weather_sensor
+
+# MQTT Configuration
+MQTT_PUB=espclient
+SUB_USERNAME=raspiclient
+MQTT_PASSWORD=your_mqtt_password
+MQTT_TOPIC=weather/data
+MQTT_PORT=1883
+BROKER_ENDPOINT=mosquitto
+
+# Dashboard Configuration
+JWT_SECRET=your-super-secret-jwt-key-here-make-it-long-and-random
+JWT_EXPIRES_IN=1d
+ADMIN_USERNAME=admin
+ADMIN_NAME=Administrator
+ADMIN_PASSWORD_HASH=your_password_hash_here
+ADMIN_EMAIL=admin@example.com
+ADMIN_ROLE=admin
+TEST_USERNAME=testuser
+TEST_NAME=Test User
+TEST_PASSWORD_HASH=your_password_hash_here
+TEST_EMAIL=test@example.com
+TEST_ROLE=user
+```
+
+### Bước 5: Cấu hình Device Certificates
+
+{{% notice warning %}}
+Quay lại bước này sau khi bạn hoàn thành [thiết lập môi trường Sandbox](/5-amplifyconfiguration/5.2-backendconfiguration)
+{{% /notice %}}
+
+1. **Đăng ký thiết bị** trong Weather Platform dashboard
+2. **Tải certificates** (certificate.pem.crt, private.pem.key, AmazonRootCA1.pem)
+3. **Cập nhật code** với certificates và IoT endpoint của bạn
+
+Bạn phải chèn tất cả credential files vào folder `/data-processor/credentials/` để publish dữ liệu lên weather platform
+
+### Bước 5: Test thiết lập
+
+1. **Chạy edge station lại**:
+
+   ```bash
+   docker compose up --build -d
+   ```
+
+2. **Xác minh truyền dữ liệu** từ ES32 tới Raspberry Pi bằng cách kiểm tra container status và logs
+   ```bash
+   docker compose ps
+   docker compose logs weather-edge-processor
+   ```
+   **Xác minh dữ liệu** xuất hiện trong dashboard
+
+{{% notice tip %}}
+Đảm bảo Raspberry Pi có kết nối internet ổn định để truyền dữ liệu đáng tin cậy.
+{{% /notice %}}

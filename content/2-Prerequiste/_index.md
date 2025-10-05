@@ -11,10 +11,10 @@ pre: " <b> 2. </b> "
 
 Before starting, ensure you have the following installed on your device (for testing and debugging):
 
-- **Node.js 18 or higher** - [Download from nodejs.org](https://nodejs.org/)
+- **[Node.js 18 or higher](https://nodejs.org/)** - Download from nodejs.org
 - **pnpm package manager** - Install with `npm install -g pnpm`
-- **AWS CLI** - [Installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-- **Git** - For cloning the repository
+- **[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)** - Installation guide
+- **[Git](https://git-scm.com/downloads)** - For cloning the repository
 
 ### Verify Installation
 

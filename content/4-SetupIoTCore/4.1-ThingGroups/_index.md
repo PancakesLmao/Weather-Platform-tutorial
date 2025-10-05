@@ -5,8 +5,6 @@ chapter: false
 pre: " <b> 4.1 </b> "
 ---
 
-# Thing Groups Configuration
-
 AWS IoT Thing Groups provide a mechanism to manage multiple devices collectively. All weather devices are organized under a central Thing Group for simplified policy management and device organization.
 
 ## Create Thing Group

@@ -5,7 +5,7 @@ chapter: false
 pre: " <b> 2.1.2 </b> "
 ---
 
-In this section, we'll configure the Raspberry Pi to act as a gateway device that collects data from ESP32 sensors and forwards it to AWS IoT Core.
+In this section, we'll configure the Raspberry Pi to act as a device gateway that collects data from ESP32 sensors and forwards it to AWS IoT Core.
 
 ### Prerequisites
 

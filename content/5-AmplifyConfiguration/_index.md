@@ -19,7 +19,7 @@ The Weather Platform uses AWS Amplify Gen 2 with a custom backend configuration 
 - AWS Glue for data processing
 - CloudFront for global content delivery
 
-### What You'll Learn
+### What you need to do
 
 In this section, you will:
 

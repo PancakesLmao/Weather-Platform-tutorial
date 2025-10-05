@@ -5,8 +5,6 @@ chapter: false
 pre: " <b> 4.2 </b> "
 ---
 
-# IoT Security Policies
-
 Two security policies are required for proper platform operation: Device Policy for weather stations and Platform Policy for user access.
 
 ## Device Policy (WeatherStationPolicies)

@@ -1,38 +1,64 @@
+﻿---
+title: "Thiết lập môi trường Cloud"
+weight: 2
+chapter: false
+pre: " <b> 2.2 </b> "
 ---
-title : "Tạo IAM Role"
-weight : 2 
-chapter : false
-pre : " <b> 2.2 </b> "
----
 
-### Tạo IAM Role
+Trong bước này, chúng ta sẽ thiết lập môi trường để tương tác với AWS resources từ terminal của developer sử dụng AWS CLI
 
-Trong bước này chúng ta sẽ tiến hành tạo IAM Role. Trong IAM Role này sẽ được gán policy **AmazonSSMManagedInstanceCore**, đây là policy cho phép máy chủ EC2 có thể giao tiếp với Session Manager.
+## Thiết lập AWS Account
 
-1. Truy cập vào [giao diện quản trị dịch vụ IAM](https://console.aws.amazon.com/iamv2/)
-2. Ở thanh điều hướng bên trái, click  **Roles**.  
+### Bước 1: Yêu cầu AWS Account
 
-![role](/images/2.prerequisite/038-iamrole.png)
+- Trước tiên bạn cần một AWS Account với các quyền phù hợp
+- Cấp quyền để tạo IAM users và policies
+- Cấu hình cảnh báo billing (khuyến nghị)
 
-3. Click **Create role**.  
+### Bước 2: Tạo IAM User cho Development
 
-![role1](/images/2.prerequisite/039-iamrole.png)
+1. **Vào AWS Console** IAM Users "Create user"
 
-4. Click **AWS service** và click **EC2**. 
-  + Click **Next: Permissions**.  
+2. **Chi tiết User:**
 
-![role1](/images/2.prerequisite/040-iamrole.png)
+   - Username: `ws1-amplify`
+   - Chọn "Provide user access to the AWS Management Console" nếu cần
 
-5. Trong ô Search, điền **AmazonSSMManagedInstanceCore** và ấn phím Enter để tìm kiếm policy này.
-  + Click chọn policy **AmazonSSMManagedInstanceCore**.
-  + Click **Next: Tags.**
+3. **Cài đặt permissions:**
 
-![createpolicy](/images/2.prerequisite/041-iamrole.png)
+   - Chọn "Attach policies directly"
+   - Thêm các managed policies sau:
+     - `AmplifyBackendDeployFullAccess` (để deploy Amplify backend resources)
+     - `AWSCloudFormationReadOnlyAccess` (để kiểm tra resource creation và debug stack builds)
+     - `IAMFullAccess` (để quản lý IAM policies và xác minh permissions)
+     - `AWSIoTFullAccess` (cho IoT Core interactions qua CLI và attach IoT policies)
 
-6. Click **Next: Review**.
-7. Đặt tên cho Role là **SSM-Role** ở Role Name  
-  + Click **Create Role** \.
+4. **Tạo Access Keys:**
+   - Vào user Security credentials "Create access key"
+   - Chọn "Command Line Interface (CLI)"
+   - Lưu **Access Key ID** và **Secret Access Key**
 
-![namerole](/images/2.prerequisite/042-iamrole.png)
+{{% notice warning %}}
+Lưu trữ AWS credentials của bạn an toàn và không bao giờ commit chúng vào version control!
+{{% /notice %}}
 
-Tiếp theo chúng ta sẽ thực hiện kết nối đến các máy chủ EC2 chúng ta đã tạo bằng **Session Manager**.
+### Bước 3: Cấu hình AWS CLI Profile
+
+Thiết lập một named profile cho project này:
+
+```bash
+# Cấu hình AWS CLI với profile của bạn
+aws configure --profile weather-platform
+
+# Nhập khi được yêu cầu:
+# AWS Access Key ID: [your-access-key-id]
+# AWS Secret Access Key: [your-secret-access-key]
+# Default region name: us-east-1 (hoặc region bạn muốn)
+# Default output format: json
+```
+
+Xác minh profile:
+
+```bash
+aws sts get-caller-identity --profile weather-platform
+```

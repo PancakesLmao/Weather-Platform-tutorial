@@ -15,7 +15,12 @@ The data lake is an S3 bucket named `itea-weather-data-lake-storage` that stores
 
 - Raw IoT sensor messages (JSON format)
 - AWS Glue ETL scripts for data processing
-
+### Create S3 Bucket
+![Create Bucket](/images/3-datalake/1.png)
+![Create Bucket](/images/3-datalake/2.png)
+![Create Bucket](/images/3-datalake/3.png)
+![Create Bucket](/images/3-datalake/4.png)
+Click **Create bucket** to finish.
 ### Data Lake Bucket Structure
 
 The data lake is organized with the following folder structure:
@@ -44,28 +49,6 @@ raw-data/weatherPlatform/telemetry/{location}/
 ```
 
 Where `{location}` is the specific location identifier (e.g., `itea-lab-room-a`, `outdoor-station-1`).
-
-### Setup
-
-If you want to create the data lake bucket manually for learning:
-
-1. **Go to S3 Console**: https://console.aws.amazon.com/s3/
-2. **Click "Create bucket"**
-3. **Configure settings**:
-
-   - **Bucket name**: `itea-weather-data-lake-storage-yourname` (must be globally unique)
-   - **Region**: Same as your Amplify deployment region
-   - **Block Public Access**: Keep enabled for security
-   - **Versioning**: Optional (disabled by default)
-
-4. **Create folder structure**:
-   ```bash
-   # Create the required folder structure
-   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/
-   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/weatherPlatform/
-   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key raw-data/weatherPlatform/telemetry/
-   aws s3api put-object --bucket itea-weather-data-lake-storage-yourname --key glue-scripts/
-   ```
 
 ### Important Notes
 

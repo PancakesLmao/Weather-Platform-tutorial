@@ -113,20 +113,6 @@ aws cloudformation delete-stack --stack-name amplify-<app-name> --profile ws1-am
 aws resourcegroupstaggingapi get-resources --tag-filters Key=amplify:project-name --profile ws1-amplify
 ```
 
-Your Weather Platform resources are now completely cleaned up, with no ongoing AWS charges.
-
-### Cost Impact of Cleanup
-
-**Before cleanup** (monthly costs):
-
-- Weather Platform: $1.42/month
-- See [Section 7: Pricing Plan](../7-pricingplan/) for detailed cost breakdown
-
-**After cleanup**: $0.00/month
-
-- All AWS resources deleted
-- No ongoing charges
-
 {{% notice success %}}
-Complete cleanup ensures you avoid the **$1.42/month** platform cost. For detailed cost analysis, see the [Pricing Plan section](../7-pricingplan/).
+Complete cleanup ensures you avoid the platform monthly cost. For detailed cost analysis, see the [Pricing Plan section](../7-pricingplan/).
 {{% /notice %}}

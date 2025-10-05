@@ -1,22 +1,38 @@
 ---
-title : "Các bước chuẩn bị"
-weight : 2 
-chapter : false
-pre : " <b> 2. </b> "
+title: "Yêu cầu & Thiết lập"
+weight: 2
+chapter: false
+pre: " <b> 2. </b> "
 ---
 
-{{% notice info %}}
-Bạn cần tạo sẵn 1 Linux instance thuộc public subnet và 1 Window instance thuộc private subnet để thực hiện bài thực hành này.
-{{% /notice %}}
+## Thiết lập môi trường phát triển
 
-Để tìm hiểu cách tạo các EC2 instance và VPC với public/private subnet các bạn có thể tham khảo bài lab :
-  - [Giới thiệu về Amazon EC2](https://000004.awsstudygroup.com/vi/)
-  - [Làm việc với Amazon VPC](https://000003.awsstudygroup.com/vi/)
+### Phần mềm yêu cầu
 
-Để sử dụng System Manager để quản lý window instance nói riêng và các instance nói chung của chúng ta trên AWS, ta cần phải cung cấp quyền cho các instance của chúng ta có thể làm việc với System Manager.Trong phần chuẩn bị này, chúng ta cũng sẽ tiến hành tạo IAM Role để cấp quyền cho các instance có thể làm việc với System Manager.
+Trước khi bắt đầu, hãy đảm bảo bạn đã cài đặt những phần mềm sau trên thiết bị của mình (để testing và debugging):
 
-### Nội dung
-  - [Chuẩn bị VPC và EC2 Instance](2.1-createec2/)
-  - [Tạo IAM Role](2.2-createiamrole/)
+- **[Node.js 18 or higher](https://nodejs.org/)** - Tải từ nodejs.org
+- **pnpm package manager** - Cài với lệnh `npm install -g pnpm`
+- **[AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)** - Installation guide
+- **[Git](https://git-scm.com/downloads)** - Để clone repo về máy
 
-  
+### Xác minh cài đặt
+
+```bash
+# Kiểm tra phiên bản Node.js
+node --version  # Nên là 18+
+
+# Kiểm tra pnpm
+pnpm --version
+
+# Kiểm tra AWS CLI
+aws --version
+
+# Kiểm tra Git
+git --version
+```
+
+## Nội dung
+
+- [Thiết lập thiết bị biên](2.1-setupedge/)
+- [Thiết lập môi trường Cloud](2.2-setupcloud/)

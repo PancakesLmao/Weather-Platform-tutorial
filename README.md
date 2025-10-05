@@ -19,25 +19,6 @@
 - [What is Amplify Auth?](#what-is-amplify-auth)
 - [IoT Device Management](#iot-device-management)
 
-[Tutorial](#tutorial)
-
-- [Setup AWS IoT Core](#setup-aws-iot-core)
-- [Setup Nextjs App (App Router)](#setup-nextjs-app-app-router)
-- [Setup Amplify Sandbox backend (Manually)](#setup-amplify-sandbox-backend-manually)
-- [What is Cloud Sandbox Environment](#what-is-cloud-sandbox-environment)
-- [Working directory for Amplify](#working-directory-for-amplify)
-- [Deploy backend (Sandbox environment)](#deploy-amplify-backend-sandbox-environment)
-- [Launching Amazon Cognito](#launching-amazon-cognito)
-- [Setup Users](#setup-users)
-- [Setup Group (Optional)](#setup-group-optional)
-- [Complete setup new user](#complete-setup-new-user)
-- [Launching Lambda Functions](#launching-lambda-functions)
-- [Launching CDK Storage (S3)](#launching-cdk-storage-s3)
-- [Launching AWS Glue](#launching-aws-glue)
-- [Launching CloudFront](#launching-cloudfront)
-- [User IoT Policy Attachment](#user-iot-policy-attachment)
-- [Deploy to production](#deploy-to-production)
-
 ---
 
 # Basic Knowledge
@@ -202,22 +183,9 @@ Amplify Auth is AWS Amplify's authentication service that provides secure user m
 
 **Amazon Cognito Identity Pools** provide temporary AWS credentials to authenticated users, enabling secure access to AWS services. Identity Pools support both authenticated and unauthenticated access patterns.
 
-## Implementation Guide
+## Troubleshooting Common Issues
 
-### AWS IoT Core Setup
-
-#### Thing Groups Configuration
-
-AWS IoT Thing Groups provide a mechanism to manage multiple devices collectively. All weather devices are organized under a central Thing Group for simplified policy management and device organization.
-
-**Thing Group Setup:**
-
-1. Navigate to **AWS IoT Core** Console
-2. Go to Manage → **Thing Groups**
-3. Create a new Thing Group named `ITeaWeatherHub`
-4. Configure group attributes and policies
-
-#### IoT Security Policies
+### Development Environment Issues
 
 Two security policies are required for proper platform operation:
 
@@ -599,8 +567,6 @@ When you deploy the Amplify backend using `npx ampx sandbox`, the following reso
 ##### Complete setup new user
 
 According to Amazon Cognito developer guide, a user account has 4 confirmation states: Registered (Unconfirmed), Confirmed, Password Reset Required, Force Change Password, Disabled. We only need to focus on Confirmed, Password Reset Required, Force Change Password, since we don't have a Sign up option. When User accounts are created by an administrator or developer, its status will be **Force Change Password,** you won't be able to login with this account, YET.
-
-
 
 If the user tries to log in directly without doing this, you'll get this error:
 **"User needs to be authenticated to call this API" (error 400 - Bad Request)**
@@ -1447,54 +1413,6 @@ git push origin main
 - [Production Best Practices](https://docs.amplify.aws/nextjs/deploy-and-host/fullstack-branching/)
 - [Environment Variables](https://docs.amplify.aws/nextjs/build-a-backend/functions/environment-variables-and-secrets/)
 
-## Enhanced Architecture Features
-
-### Authentication System
-
-The platform implements a **hybrid authentication system** optimized for both client-side and server-side contexts:
-
-#### Client-Side Authentication (Page Access)
-
-- **Purpose**: Controls access to `/platform/*` pages
-- **Method**: Amplify `getCurrentUser()` + React Context + Protected Routes
-- **Performance**: Instant (client-side, no network calls)
-- **Storage**: HTTP-only cookies managed automatically by Amplify
-
-#### Server-Side Authentication (API Protection)
-
-- **Purpose**: Secures API routes (`/api/iot/*`, `/api/weather/*`)
-- **Method**: Edge Runtime compatible JWT validation with Cognito public key verification
-- **Performance**: ~15ms per request (with 5s timeout fallback)
-- **Storage**: Reads same HTTP-only cookies, validates JWT tokens server-side
-
-#### Key Benefits
-
-- **120x Performance Improvement**: From ~1200ms to ~15ms per request
-- **100% Reliability**: No Amplify server context dependencies
-- **Edge Runtime Compatible**: Full support for Next.js Edge Runtime
-- **Enhanced Security**: Cryptographic signature verification with graceful fallbacks
-
-### CDK Custom Constructs Benefits
-
-#### Storage Architecture
-
-- **No Circular Dependencies**: Direct bucket policy management
-- **Advanced Configuration**: Lifecycle rules, CORS policies, custom tags
-- **Better Integration**: Direct references between CloudFront and S3
-
-#### Data Processing Pipeline
-
-- **Glue Database**: Central catalog for weather telemetry schemas
-- **Glue Crawler**: Automated schema discovery and cataloging
-- **Glue ETL Job**: PySpark-based data transformation
-- **EventBridge Scheduling**: Weekly automated data processing
-
-#### Global Distribution
-
-- **CloudFront CDN**: Global access to processed datasets
-- **Origin Access Control**: Secure S3 integration
-- **Cache Optimization**: Efficient dataset distribution
-
 ## Troubleshooting Common Issues
 
 ### Development Environment Issues
@@ -1518,149 +1436,6 @@ The platform implements a **hybrid authentication system** optimized for both cl
 - **Solution**: Run `npx ampx configure profile` to set up credentials
 - **Verification**: Check `~/.aws/credentials` and `~/.aws/config` files
 - **Multiple Profiles**: Use `--profile <name>` flag with ampx commands
-
-### Backend Deployment Issues
-
-**CDK Bootstrap Failures:**
-
-- **Problem**: "Region not bootstrapped" error on first deployment
-- **Solution**: Sign in to AWS Console as Administrator and complete bootstrap
-- **Prevention**: Use regions that are already bootstrapped (us-east-1 recommended)
-- **Manual Bootstrap**: Run `cdk bootstrap aws://ACCOUNT/REGION` with admin credentials
-
-**CloudFormation Stack Conflicts:**
-
-- **Problem**: DELETE_FAILED status during stack deletion
-- **Solution**: Use AWS Console to manually delete stuck resources
-- **Prevention**: Use CDK constructs for better dependency management
-- **Force Delete**: Add `--retain-resources` flag when necessary
-
-**Lambda Function Deployment Errors:**
-
-- **Problem**: "Function code too large" or timeout errors
-- **Solution**: Optimize dependencies, increase timeout, check memory allocation
-- **Debugging**: Check CloudWatch Logs for detailed error information
-- **Code Issues**: Ensure proper error handling in handler functions
-
-### Authentication and Access Issues
-
-**User Login Failures:**
-
-- **Problem**: "User needs to be authenticated" error (400)
-- **Root Cause**: User account in "Force Change Password" state
-- **Solution**: Complete password change flow before login
-- **Verification**: Check user status in Cognito Console
-
-**IoT Core Access Denied:**
-
-- **Problem**: Authenticated users can't access IoT resources
-- **Root Cause**: IoT policy not attached to user's Identity ID
-- **Solution**: Follow [User IoT Policy Attachment](#user-iot-policy-attachment) section
-- **Verification**: Check policy targets in IoT Core Console
-
-**API Route Authentication Errors:**
-
-- **Problem**: 401 Unauthorized on API calls
-- **Debugging Steps**:
-  1. Verify user is authenticated: `getCurrentUser()`
-  2. Check browser cookies for auth tokens
-  3. Verify Amplify configuration in frontend
-  4. Check API route authentication logic
-
-### Device Registration Issues
-
-**IoT Thing Creation Failures:**
-
-- **Problem**: Lambda function errors during device registration
-- **Common Causes**: Missing IoT permissions, invalid thing group names
-- **Solution**: Verify IAM policies on Lambda execution role
-- **Debugging**: Check CloudWatch Logs for specific error messages
-
-**Certificate Attachment Errors:**
-
-- **Problem**: Policy attachment fails during device registration
-- **Solution**: Ensure certificates are active and policies exist
-- **Verification**: Check IoT Core Console for certificate status
-
-### Data Processing Issues
-
-**S3 Bucket Access Errors:**
-
-- **Problem**: Lambda functions can't access S3 buckets
-- **Solution**: Verify bucket policies and Lambda execution role permissions
-- **CORS Issues**: Check bucket CORS configuration for web access
-
-**CloudFront Distribution Errors:**
-
-- **Problem**: 403 Access Denied from CloudFront
-- **Solution**: Verify Origin Access Control (OAC) configuration
-- **Cache Issues**: Invalidate CloudFront cache after bucket updates
-
-**Glue Job Failures:**
-
-- **Problem**: ETL jobs fail with script errors
-- **Solution**: Verify script location and IAM role permissions
-- **Data Issues**: Check input data format and schema compatibility
-
-### Production Deployment Issues
-
-**Build Failures:**
-
-- **Problem**: Amplify build process fails
-- **Common Causes**: Missing dependencies, environment variables, build command errors
-- **Solution**: Check build logs in Amplify Console
-- **Local Testing**: Run `pnpm run build` locally to reproduce issues
-
-**Environment Variable Issues:**
-
-- **Problem**: Runtime errors due to missing environment variables
-- **Solution**: Configure environment variables in Amplify Console
-- **Secrets**: Use Amplify secrets for sensitive configuration
-
-**DNS and Domain Issues:**
-
-- **Problem**: Custom domain not resolving or SSL certificate errors
-- **Solution**: Verify domain configuration and certificate validation
-- **Propagation**: Allow time for DNS changes to propagate globally
-
-### Performance Issues
-
-**Slow API Response Times:**
-
-- **Problem**: Lambda cold starts causing delays
-- **Solutions**:
-  - Implement Lambda warming strategies
-  - Optimize function memory allocation
-  - Reduce bundle sizes and dependencies
-  - Use provisioned concurrency for critical functions
-
-**Frontend Loading Issues:**
-
-- **Problem**: Slow page loads or hydration errors
-- **Solutions**:
-  - Optimize bundle sizes with webpack analysis
-  - Implement proper loading states
-  - Use Next.js built-in performance optimizations
-  - Enable CloudFront caching for static assets
-
-### Data Consistency Issues
-
-**IoT Message Delivery:**
-
-- **Problem**: Messages not appearing in real-time dashboard
-- **Debugging**:
-  1. Check IoT Core Test console for message flow
-  2. Verify MQTT topic subscriptions
-  3. Check WebSocket connection status
-  4. Review device authentication and connectivity
-
-**Database Synchronization:**
-
-- **Problem**: Inconsistent data between services
-- **Solutions**:
-  - Implement proper error handling and retries
-  - Use AWS EventBridge for reliable event processing
-  - Monitor CloudWatch metrics for processing delays
 
 ### Debugging Tools and Commands
 
@@ -1769,16 +1544,16 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 
 **Implemented Features (Weather Station Specific):**
 
-- ✅ User registration and secure authentication (Cognito)
-- ✅ Weather station registration and management
-- ✅ Real-time weather telemetry data collection and visualization
-- ✅ Basic historical weather data storage and retrieval
-- ✅ Device connectivity status monitoring
-- ✅ Multi-tenant architecture supporting multiple lab users
-- ✅ Global dataset distribution via CloudFront CDN
-- ✅ Weather data processing and transformation (AWS Glue)
-- ✅ MQTTS protocol support with X.509 certificates
-- ✅ Weather-specific UI dashboards and widgets
+- User registration and secure authentication (Cognito)
+- Weather station registration and management
+- Real-time weather telemetry data collection and visualization
+- Basic historical weather data storage and retrieval
+- Device connectivity status monitoring
+- Multi-tenant architecture supporting multiple lab users
+- Global dataset distribution via CloudFront CDN
+- Weather data processing and transformation (AWS Glue)
+- MQTTS protocol support with X.509 certificates
+- Weather-specific UI dashboards and widgets
 
 **Current Limitations:**
 
@@ -1793,7 +1568,7 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 
 **Technical Stack:**
 
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15, React 19, TypeScript, Shadcn
 - **Backend**: AWS Amplify Gen 2, Lambda Functions, API Gateway
 - **Database**: DynamoDB (device metadata), S3 Data Lake (telemetry)
 - **Authentication**: Amazon Cognito with custom JWT validation
@@ -1918,77 +1693,6 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 - No automated device onboarding workflow
 - Limited batch device management capabilities
 
-## Future Roadmap
-
-### Phase 1: Core Platform Enhancements (Next 6 months)
-
-**Analytics Implementation**
-
-- 📊 Historical data analysis with charts and trends
-- 📈 Basic weather pattern recognition
-- 🔔 Threshold-based alerting system
-- 📋 Automated reporting and data export
-
-**Protocol Expansion**
-
-- 🌐 HTTP/HTTPS endpoint support for devices
-- 📡 LoRaWAN gateway integration
-- 🔄 Multi-protocol device support
-- 📱 REST API for third-party integrations
-
-**UI/UX Improvements**
-
-- 📊 Enhanced dashboard customization
-- 📱 Mobile-responsive design improvements
-- 🎨 Customizable widget layouts
-- 🔍 Advanced data filtering and search
-
-### Phase 2: Advanced Features (6-12 months)
-
-**Machine Learning & AI**
-
-- 🤖 Weather prediction models using historical data
-- 🔍 Anomaly detection for device malfunctions
-- 📊 Advanced analytics and insights
-- 🎯 Predictive maintenance for weather stations
-
-**Device Management**
-
-- 🔄 Over-the-air (OTA) firmware updates
-- 📦 Batch device operations and configuration
-- 🔧 Remote device diagnostics and troubleshooting
-- 📋 Automated device onboarding workflows
-
-**Integration & Extensibility**
-
-- 🌤️ Third-party weather API integration
-- 🗺️ Geographic mapping and location services
-- 📧 Email and SMS notification systems
-- 🔗 Webhook support for external systems
-
-### Phase 3: Enterprise Features (12+ months)
-
-**Platform Generalization**
-
-- 🔧 Generic IoT device support beyond weather stations
-- 📝 Configurable message schemas and data models
-- 🎨 White-label platform customization
-- 🏢 Multi-tenant enterprise management
-
-**Advanced Security**
-
-- 🔐 Multi-factor authentication (MFA)
-- 👥 Advanced role-based access control (RBAC)
-- 📜 Comprehensive audit logging
-- 🔒 Single sign-on (SSO) integration
-
-**Scalability & Performance**
-
-- 🌍 Multi-region deployment support
-- ⚡ Edge computing for real-time processing
-- 🔄 Auto-scaling based on device load
-- 📊 Advanced monitoring and observability
-
 ## Migration Considerations
 
 ### For Current Users
@@ -2005,52 +1709,6 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 - SDK development for common programming languages
 - Reference implementations for various hardware platforms
 
-## Development Priorities
-
-**High Priority (Critical for lab operations):**
-
-1. 🔥 Advanced analytics and reporting
-2. 🔥 Automated alerting system
-3. 🔥 Batch device management
-4. 🔥 Mobile application development
-
-**Medium Priority (Enhanced user experience):**
-
-1. ⭐ Protocol expansion (HTTP support)
-2. ⭐ UI customization capabilities
-3. ⭐ Third-party integrations
-4. ⭐ Enhanced security features
-
-**Low Priority (Future expansion):**
-
-1. 💫 Platform generalization
-2. 💫 Machine learning features
-3. 💫 Multi-region deployment
-4. 💫 Enterprise features
-
-### Development Best Practices Established
-
-**Code Organization:**
-
-- Clear separation of concerns between frontend and backend
-- Modular Lambda functions with single responsibilities
-- Type-safe API contracts using TypeScript interfaces
-- Comprehensive error handling and logging
-
-**Infrastructure Management:**
-
-- Version-controlled infrastructure as code
-- Environment-specific configuration management
-- Automated testing for critical functions
-- Documentation-driven development approach
-
-**Security Implementation:**
-
-- Principle of least privilege for all IAM policies
-- Regular security audits and dependency updates
-- Secure credential management practices
-- Data encryption and access logging
-
 ### Learning Outcomes
 
 This project demonstrates practical experience with:
@@ -2064,45 +1722,15 @@ This project demonstrates practical experience with:
 - **Problem-Solving**: Addressing specific lab operational challenges
 - **Documentation**: Comprehensive technical documentation for specialized systems
 
-### Final Recommendations
-
-**For Production Deployment:**
-
-1. Implement comprehensive monitoring and alerting
-2. Establish backup and disaster recovery procedures
-3. Conduct security audits and penetration testing
-4. Set up cost monitoring and optimization alerts
-5. Document operational procedures and runbooks
-
-**For Continued Development:**
-
-1. Implement automated testing for all components
-2. Set up CI/CD pipelines for automated deployments
-3. Establish code review and quality gates
-4. Monitor performance metrics and optimize bottlenecks
-5. Plan for scalability and capacity management
-
-**For Team Adoption:**
-
-1. Provide comprehensive developer onboarding documentation
-2. Establish coding standards and best practices
-3. Implement peer review processes
-4. Create development environment setup automation
-5. Document troubleshooting procedures and common issues
-
-## Conclusion
-
-The Weather Platform successfully addresses **Itea Lab's primary need for centralized weather station management**, eliminating manual data collection and providing real-time monitoring capabilities. While the platform currently has specific limitations, it demonstrates solid cloud-native architecture principles and provides a robust foundation for future enhancements.
-
 ### Project Success Metrics
 
 **Core Objectives Achieved:**
 
-- ✅ **Centralized Management**: Lab personnel can monitor all weather stations from a single dashboard
-- ✅ **Automated Data Collection**: Eliminates manual site visits for data retrieval
-- ✅ **Real-time Monitoring**: Live weather data and device connectivity status
-- ✅ **Scalable Architecture**: Cloud-native design supporting multiple users and devices
-- ✅ **Secure Access**: Authentication and authorization for lab personnel
+- **Centralized Management**: Lab personnel can monitor all weather stations from a single dashboard
+- **Automated Data Collection**: Eliminates manual site visits for data retrieval
+- **Real-time Monitoring**: Live weather data and device connectivity status
+- **Scalable Architecture**: Cloud-native design supporting multiple users and devices
+- **Secure Access**: Authentication and authorization for lab personnel
 
 **Technical Achievements:**
 

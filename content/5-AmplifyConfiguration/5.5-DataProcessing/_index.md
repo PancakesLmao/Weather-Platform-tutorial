@@ -11,9 +11,7 @@ The Weather Platform uses AWS Glue to transform raw IoT messages into structured
 
 ### Processing Flow
 
-```
-IoT Devices → IoT Core → S3 Data Lake → EventBridge → Step Functions → Glue Crawler → Glue ETL Job → Processed Datasets → S3 → CloudFront
-```
+![Processing Flow](/images/5-amplifyConfiguration/5.5-data-processing/glue-flow.png)
 
 **Orchestration Flow**:
 
@@ -22,7 +20,7 @@ IoT Devices → IoT Core → S3 Data Lake → EventBridge → Step Functions →
    - Starts Glue Crawler to update schema
    - Waits for crawler completion
    - Starts Glue ETL Job for data transformation
-   - Handles error states and retries
+   - Export error states (If any)
 
 ### Glue Components
 
@@ -69,14 +67,6 @@ startCrawler
       .otherwise(crawlerFailed) // 4c. Handle failure
   );
 ```
-
-**Benefits of Step Functions**:
-
-- **Reliable orchestration** with automatic retries
-- **Visual workflow** monitoring in AWS Console
-- **Error handling** with proper failure states
-- **State persistence** across service calls
-- **Cost optimization** - only runs when needed
 
 ### Scheduling
 

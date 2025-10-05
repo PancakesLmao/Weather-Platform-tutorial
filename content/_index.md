@@ -37,7 +37,7 @@ The Weather Platform provides:
 
 ### Key Technologies
 
-- **Frontend**: Next.js 15 with App Router, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15 with App Router, TypeScript, Shadcn
 - **Backend**: AWS Amplify Gen 2 with custom CDK constructs
 - **IoT**: AWS IoT Core with MQTT protocol
 - **Data Processing**: AWS Glue for ETL operations

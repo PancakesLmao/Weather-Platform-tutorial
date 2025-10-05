@@ -5,24 +5,24 @@ chapter: false
 pre: " <b> 4.3 </b> "
 ---
 
-## IoT Rule Engine for S3 Data Lake
+## IoT Rule Engine cho S3 Data Lake
 
-The IoT Rule Engine routes incoming weather telemetry messages from IoT devices directly to the S3 data lake for storage and processing.
+IoT Rule Engine định tuyến các thông điệp telemetry thời tiết từ các thiết bị IoT trực tiếp đến S3 data lake để lưu trữ và xử lý.
 
-### Rule Purpose
+### Mục đích của Rule
 
-This rule automatically:
+Rule này tự động:
 
-- Captures all weather telemetry messages from `weatherPlatform/telemetry/*` topics
-- Routes messages to the S3 data lake bucket (`itea-weather-data-lake-storage`)
-- Organizes data by location in the correct folder structure
+- Bắt tất cả thông điệp telemetry thời tiết từ các topic `weatherPlatform/telemetry/*`
+- Định tuyến thông điệp đến S3 data lake bucket (`itea-weather-data-lake-storage`)
+- Tổ chức dữ liệu theo vị trí trong cấu trúc thư mục chính xác
 
-### Create IoT Rule
+### Tạo IoT Rule
 
-1. **Navigate to AWS IoT Core Console**
-2. **Go to Message routing** → **Rules**
-3. **Click "Create rule"**
-4. **Configure rule settings**:
+1. **Truy cập AWS IoT Core Console**
+2. **Vào Message routing** → **Rules**
+3. **Nhấn "Create rule"**
+4. **Cấu hình rule settings**:
 
    - **Rule name**: `WeatherTelemetryToS3Rule`
    - **Description**: `Route weather telemetry data to S3 data lake`
@@ -37,13 +37,13 @@ This rule automatically:
 6. **Rule actions** → **Add action**:
 
    - **Action type**: **S3**
-   - **S3 bucket**: `itea-weather-data-lake-storage-yourname` (use your unique bucket name)
+   - **S3 bucket**: `itea-weather-data-lake-storage-yourname` (sử dụng tên bucket duy nhất của bạn)
    - **Key**: `raw-data/weatherPlatform/telemetry/${location}/${timestamp()}.json`
 
 7. **Create or select IAM role**:
 
    - **Role name**: `IoTRuleToS3Role`
-   - **Attach policy**: Allow S3 PutObject permissions
+   - **Attach policy**: Cho phép quyền S3 PutObject
 ```json
 {
     "Version": "2012-10-17",
@@ -58,23 +58,22 @@ This rule automatically:
     ]
 }
 ```
-
 ![Rule Engine](/images/4-iotcore/9.png)
 ![Rule Config](/images/4-iotcore/10.png)
 ![Rule Config](/images/4-iotcore/11.png)
 ![Rule Config](/images/4-iotcore/12.png)
 ![Rule Config](/images/4-iotcore/13.png)
 
-8. **Click "Create rule"**
+8. **Nhấn "Create rule"**
 
-### SQL Statement Explained
+### Giải thích SQL Statement
 
 ```sql
 SELECT * FROM 'weatherPlatform/telemetry/+'
 ```
 
-- `SELECT *`: Captures the entire message payload
-- `FROM 'weatherPlatform/telemetry/+'`: Matches all topics under telemetry (+ is wildcard)
+- `SELECT *`: Bắt toàn bộ message payload
+- `FROM 'weatherPlatform/telemetry/+'`: Match tất cả các topic dưới telemetry (+ là wildcard)
 
 ### S3 Key Pattern
 
@@ -82,7 +81,7 @@ SELECT * FROM 'weatherPlatform/telemetry/+'
 raw-data/weatherPlatform/telemetry/${location}/${timestamp()}.json
 ```
 
-**Result structure**:
+**Cấu trúc kết quả**:
 
 ```
 itea-weather-data-lake-storage-yourname/
@@ -97,9 +96,9 @@ itea-weather-data-lake-storage-yourname/
                 └── 1696118460000.json
 ```
 
-### Test the Rule
+### Kiểm tra Rule
 
-1. **Use IoT Core Message Client**:
+1. **Sử dụng IoT Core Message Client**:
 
    - **Topic**: `weatherPlatform/telemetry/test-location`
    - **Message**:
@@ -115,27 +114,27 @@ itea-weather-data-lake-storage-yourname/
 ![Test routing](/images/4-iotcore/14.png)
 ![Test routing](/images/4-iotcore/15.png)
 
-2. **Check S3 bucket** for the stored message at:
+2. **Kiểm tra S3 bucket** cho thông điệp đã lưu tại:
    ```
    raw-data/weatherPlatform/telemetry/test-location/{timestamp}.json
    ```
 ![Test routing](/images/4-iotcore/16.png)
 
 {{% notice warning %}}
-**Important**: Replace `itea-weather-data-lake-storage-yourname` with your actual unique bucket name in both the S3 action and IAM policy.
+**Quan trọng**: Thay thế `itea-weather-data-lake-storage-yourname` bằng tên bucket duy nhất của bạn trong cả S3 action và IAM policy.
 {{% /notice %}}
 
 {{% notice info %}}
-This rule ensures all weather device messages are automatically stored in the data lake, ready for AWS Glue processing.
+Rule này đảm bảo tất cả thông điệp từ thiết bị thời tiết được tự động lưu trữ trong data lake, sẵn sàng cho AWS Glue processing.
 {{% /notice %}}
 
-### Verification
+### Xác minh
 
-After creating the rule, verify:
+Sau khi tạo rule, xác minh:
 
-- Rule is **Enabled**
-- SQL statement syntax is correct
-- S3 action points to your unique bucket name
-- IAM role has proper S3 permissions
+- Rule đã **Enabled**
+- SQL statement syntax chính xác
+- S3 action trỏ đến tên bucket duy nhất
+- IAM role có quyền S3 phù hợp
 
-The IoT Rule Engine now automatically routes all weather telemetry to your S3 data lake for storage and further processing.
+IoT Rule Engine hiện tự động định tuyến tất cả weather telemetry đến S3 data lake của bạn để lưu trữ và xử lý tiếp theo.
