@@ -15,10 +15,7 @@
 - [Compatibility Requirements](#compatibility-requirements)
 - [Edge Architecture](#edge-architecture)
 - [Cloud Architecture](#cloud-architecture)
-- [Sign-in](#sign-in)
 - [What is Amplify Auth?](#what-is-amplify-auth)
-- [IoT Device Management](#iot-device-management)
-
 ---
 
 # Basic Knowledge
@@ -175,6 +172,14 @@ The cloud infrastructure is built on AWS services using a serverless architectur
 
 ![Cloud Architecture](./static/images/cloud-architecture.jpg)
 
+#### What is Amplify Gen 2 ?
+AWS Amplify Gen 2 is the latest generation of AWS Amplify, a development platform for building secure, scalable mobile and web applications. Amplify Gen 2 introduces several enhancements over the previous version, including:
+- Improved integration with AWS Cloud Development Kit (CDK) for defining backend infrastructure as code
+- Enhanced developer experience with simplified CLI commands and workflows
+- Better support for modern frontend frameworks and architectures
+- Enhanced support for server-side rendering (SSR) and static site generation (SSG) with frameworks like Next.js 
+- Sandbox environments for isolated development and testing
+
 #### What is Amplify Auth?
 
 Amplify Auth is AWS Amplify's authentication service that provides secure user management and access control for web and mobile applications. It is built on Amazon Cognito and integrates two core services:
@@ -183,94 +188,29 @@ Amplify Auth is AWS Amplify's authentication service that provides secure user m
 
 **Amazon Cognito Identity Pools** provide temporary AWS credentials to authenticated users, enabling secure access to AWS services. Identity Pools support both authenticated and unauthenticated access patterns.
 
-## Troubleshooting Common Issues
+#### What is Amplify Functions?
 
-### Development Environment Issues
+Amplify Functions is AWS Amplify's abstraction layer for creating and managing serverless functions powered by AWS Lambda. It simplifies the process of developing, testing, and deploying cloud functions within Amplify Gen 2 applications.
 
-Two security policies are required for proper platform operation:
+In this Weather Platform, Amplify Functions handle core business logic including:
 
-**Device Policy (`WeatherStationPolicies`)**
-This policy enables weather devices to connect and publish telemetry data to IoT Core:
+- Device registration and management via AWS IoT Core
+- Weather data processing and retrieval
+- Authentication validation and authorization
+- API endpoint implementation for frontend services
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "iot:Publish",
-      "Resource": "arn:aws:iot:*:*:topic/weatherPlatform/telemetry/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iot:Connect",
-      "Resource": "arn:aws:iot:*:*:client/*"
-    }
-  ]
-}
-```
+Functions are defined in the `amplify/functions/` directory with resource definitions (`resource.ts`) and handler implementations (`handler.ts`). They're automatically deployed when running `ampx sandbox` or production deployment commands.
 
-**Policy Attachment Process:**
-
-1. Navigate to IoT Core → **All devices** → **Thing Groups**
-2. Select `ITeaWeatherHub` Thing Group
-3. Go to **Policies** tab → Manage Policies
-4. Add `WeatherStationPolicies` to the Thing Group
-5. Save changes
-
-This policy assignment automatically applies to all devices within the Thing Group.
-
-**Platform Policy (`WeatherPlatformPubSubPolicy`)**
-This policy enables the web platform to interact with IoT devices, receive telemetry data, and send notifications:
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "iot:Connect",
-      "Resource": "arn:aws:iot:*:*:client/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iot:Receive",
-      "Resource": "arn:aws:iot:*:*:topic/weatherPlatform/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iot:Subscribe",
-      "Resource": "arn:aws:iot:*:*:topicfilter/weatherPlatform/telemetry/*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "iot:Publish",
-      "Resource": "arn:aws:iot:*:*:topic/weatherPlatform/notifications/*"
-    }
-  ]
-}
-```
-
-**Policy Usage:**
-This policy is attached to individual **Cognito Identity IDs** to grant authenticated users access to IoT Core resources. See the [User IoT Policy Attachment](#user-iot-policy-attachment) section for detailed implementation steps.
 
 ### Setup Next.js Application
 
 The Weather Platform uses Next.js 15 with the App Router architecture for the frontend application. The application includes:
 
-**Key Features:**
-
-- Server-side rendering (SSR) support
-- API routes for backend integration
-- Real-time data visualization components
-- Responsive design for desktop and mobile
-- TypeScript for type safety
-
 **Project Structure:**
 
 ```
 src/
-├── app/                    # Next.js App Router pages
+├── app/                   # Next.js App Router pages
 │   ├── (platform)/        # Protected platform routes
 │   └── api/               # API route handlers
 ├── components/            # React components
@@ -566,16 +506,15 @@ When you deploy the Amplify backend using `npx ampx sandbox`, the following reso
 
 ##### Complete setup new user
 
-According to Amazon Cognito developer guide, a user account has 4 confirmation states: Registered (Unconfirmed), Confirmed, Password Reset Required, Force Change Password, Disabled. We only need to focus on Confirmed, Password Reset Required, Force Change Password, since we don't have a Sign up option. When User accounts are created by an administrator or developer, its status will be **Force Change Password,** you won't be able to login with this account, YET.
+According to Amazon Cognito [developer guide](https://docs.aws.amazon.com/cognito/latest/developerguide/signing-up-users-in-your-app.html), a user account has 4 confirmation states: Registered (Unconfirmed), Confirmed, Password Reset Required, Force Change Password, Disabled. We only need to focus on Confirmed, Password Reset Required, Force Change Password, since we don't have a Sign up option. When User accounts are created by an administrator or developer, its status will be **Force Change Password,** you won't be able to login with this account, YET.
 
 If the user tries to log in directly without doing this, you'll get this error:
 **"User needs to be authenticated to call this API" (error 400 - Bad Request)**
 
 The next step here is to let user change it to a new password, only then can it be marked as **Confirmed.** Now try to log in again
 
-![Password Change Success](media/image1.png)
+![Account Confirmation](./static/images/amazon-cognito-sign-in-confirm-user.png)
 
-![Login Success](media/image5.png)
 
 **Link to documentation:**
 
@@ -584,8 +523,6 @@ The next step here is to let user change it to a new password, only then can it 
 - https://docs.aws.amazon.com/cognito-user-identity-pools/latest/APIReference/API_ChangePassword.html
 
 ### Launching Lambda Functions
-
-**Note:** This section has been completely rewritten to align with Amplify Gen 2 best practices.
 
 Before setup, make sure you have installed `@types/aws-lambda` for the current project
 
@@ -1412,6 +1349,7 @@ git push origin main
 - [Amplify Hosting Guide](https://docs.amplify.aws/nextjs/deploy-and-host/)
 - [Production Best Practices](https://docs.amplify.aws/nextjs/deploy-and-host/fullstack-branching/)
 - [Environment Variables](https://docs.amplify.aws/nextjs/build-a-backend/functions/environment-variables-and-secrets/)
+
 
 ## Troubleshooting Common Issues
 
