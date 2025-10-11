@@ -46,7 +46,7 @@ Edge devices are optional for learning the platform. You can use a script as dat
 | ![Raspberry Pi](/images/2.prerequisite/setupEdge/raspberry.png) | ![Micro SD Card](/images/2.prerequisite/setupEdge/MicroSD.jpg) | ![Card Reader](/images/2.prerequisite/setupEdge/card_reader.jpg) |
 |:---------------------------------------------------------------:|:---------------------------------------------------------------:|:---------------------------------------------------------------:|
 | Raspberry Pi                                                     |Micro SD Card                                          | Card Reader                                           |
-
+![Card Reader](/images/2.prerequisite/setupEdge/card_reader.jpg)
 ## Software
 ### Arduino IDE
 
