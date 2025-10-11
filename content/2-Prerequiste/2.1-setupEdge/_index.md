@@ -23,7 +23,7 @@ Edge devices are optional for learning the platform. You can use a script as dat
 - DFRobot Weather Module
 - Solar panel (Optional)
 - OLED Screen 0.96inch I2C
-| ![ESP32](/images/2.prerequisite/setupEdge/esp32_wroom_32e.webp) | ![Weather Module](/images/2.prerequisite/setupEdge/SEN0186.jpg) |
+| ![ESP32](/images/2.prerequisite/2.1-setupEdge/esp32_wroom_32e.webp) | ![Weather Module](/images/2.prerequisite/2.1-setupEdge/SEN0186.jpg) |
 |:---------------------------------------------------------------:|:---------------------------------------------------------------:|
 | ESP32 Microcontroller                                                     | DFRobot Weather Module                                          |
 
@@ -43,10 +43,10 @@ Edge devices are optional for learning the platform. You can use a script as dat
 - Power Supply (5V 3A)
 - USB card reader
 
-| ![Raspberry Pi](/images/2.prerequisite/setupEdge/raspberry.png) | ![Micro SD Card](/images/2.prerequisite/setupEdge/MicroSD.jpg) | ![Card Reader](/images/2.prerequisite/setupEdge/card_reader.jpg) |
+| ![Raspberry Pi](/images/2.prerequisite/2.1-setupEdge/raspberry.png) | ![Micro SD Card](/images/2.prerequisite/2.1-setupEdge/MicroSD.jpg) | ![Card Reader](/images/2.prerequisite/2.1-setupEdge/card_reader.jpg) |
 |:---------------------------------------------------------------:|:---------------------------------------------------------------:|:---------------------------------------------------------------:|
 | Raspberry Pi                                                     |Micro SD Card                                          | Card Reader                                           |
-![Card Reader](/images/2.prerequisite/setupEdge/card_reader.jpg)
+
 ## Software
 ### Arduino IDE
 
