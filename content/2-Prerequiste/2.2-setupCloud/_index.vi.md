@@ -5,8 +5,8 @@ chapter: false
 pre: " <b> 2.2 </b> "
 ---
 
-Trong bước này, chúng ta sẽ thiết lập môi trường để tương tác với AWS resources từ terminal của developer sử dụng AWS CLI
-
+Ở bước này, chúng ta sẽ thiết lập môi trường để tương tác với AWS resources từ terminal của developer sử dụng AWS CLI
+![Cloud Architecture](/images/cloud-arch.jpg)
 ## Thiết lập AWS Account
 
 ### Bước 1: Yêu cầu AWS Account

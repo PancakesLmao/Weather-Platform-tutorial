@@ -6,7 +6,7 @@ pre : " <b> 2.2 </b> "
 ---
 
 In this step, we'll set up the environment to interact with AWS resources from the developer's terminal using AWS CLI
-
+![Cloud Architecture](/images/cloud-arch.jpg)
 ## AWS Account Setup
 
 ### Step 1: AWS Account Requirements

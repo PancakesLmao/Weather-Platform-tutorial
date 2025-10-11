@@ -154,7 +154,7 @@ The edge components use MQTT (Message Queuing Telemetry Transport) protocol for 
 - MQTT client implementation for cloud communication
 - Device authentication using X.509 certificates
 
-![Edge Architecture](./static/images/edge-architecture.jpg)
+![Edge Architecture](./static/images/edge-arch.jpg)
 
 ### Cloud Architecture
 
@@ -170,7 +170,7 @@ The cloud infrastructure is built on AWS services using a serverless architectur
 - Amazon CloudFront for content delivery and caching
 - AWS Amplify for application deployment and hosting
 
-![Cloud Architecture](./static/images/cloud-architecture.jpg)
+![Cloud Architecture](./static/images/cloud-arch.jpg)
 
 #### What is Amplify Gen 2 ?
 AWS Amplify Gen 2 is the latest generation of AWS Amplify, a development platform for building secure, scalable mobile and web applications. Amplify Gen 2 introduces several enhancements over the previous version, including:
@@ -1431,53 +1431,6 @@ aws cognito-identity get-id --identity-pool-id <pool-id>
 
 The Weather Platform represents a comprehensive, production-ready IoT solution built on modern AWS technologies and best practices. This documentation has provided detailed guidance for implementing a scalable, secure, and maintainable weather monitoring system.
 
-### Key Achievements
-
-**Technical Implementation:**
-
-- **Serverless Architecture**: Complete serverless implementation using AWS Lambda, IoT Core, and Amplify Gen 2
-- **Modern Frontend**: Next.js 15 with App Router, TypeScript, and real-time data visualization
-- **Secure Authentication**: Hybrid authentication system with 120x performance improvement
-- **Scalable Data Processing**: CDK-based ETL pipeline with AWS Glue and EventBridge
-- **Global Distribution**: CloudFront CDN for worldwide dataset access
-
-**Developer Experience:**
-
-- **Automated Deployments**: Sandbox environments for rapid development iteration
-- **Infrastructure as Code**: CDK constructs for reproducible infrastructure
-- **Comprehensive Monitoring**: CloudWatch integration for observability
-- **Type Safety**: End-to-end TypeScript implementation
-
-### Architecture Benefits
-
-**Scalability:**
-
-- Serverless functions automatically scale with demand
-- IoT Core handles millions of device connections
-- CloudFront provides global content distribution
-- S3 storage scales infinitely with usage patterns
-
-**Security:**
-
-- Individual IoT policies per user for fine-grained access control
-- JWT token validation with cryptographic signature verification
-- VPC isolation for sensitive processing workloads
-- Encryption at rest and in transit for all data
-
-**Cost Optimization:**
-
-- Pay-per-use serverless pricing model
-- S3 lifecycle policies for automatic data archival
-- CloudFront caching reduces origin requests
-- Right-sized Lambda functions minimize execution costs
-
-**Reliability:**
-
-- Multi-AZ deployment for high availability
-- Automatic failover for managed services
-- Backup and recovery procedures documented
-- Monitoring and alerting for proactive issue detection
-
 ### Platform Capabilities Summary
 
 **Implemented Features (Weather Station Specific):**
@@ -1495,49 +1448,6 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 
 **Current Limitations:**
 
-- ❌ Advanced analytics and reporting (planned)
-- ❌ Automated alerting system (planned)
-- ❌ Support for non-weather IoT devices
-- ❌ HTTP/CoAP protocol support
-- ❌ Mobile application
-- ❌ Machine learning and predictive analytics
-- ❌ Generic/configurable message schemas
-- ❌ Batch device operations
-
-**Technical Stack:**
-
-- **Frontend**: Next.js 15, React 19, TypeScript, Shadcn
-- **Backend**: AWS Amplify Gen 2, Lambda Functions, API Gateway
-- **Database**: DynamoDB (device metadata), S3 Data Lake (telemetry)
-- **Authentication**: Amazon Cognito with custom JWT validation
-- **IoT**: AWS IoT Core with MQTTS protocol only
-- **Data Processing**: AWS Glue (ETL), EventBridge, CloudWatch
-- **CDN**: CloudFront with Origin Access Control
-- **Infrastructure**: CDK custom constructs, CloudFormation
-- **Deployment**: AWS Amplify Hosting with branch-based environments
-
-### Immediate Priorities (Based on Lab Requirements)
-
-**Critical Missing Features:**
-
-- **Analytics Dashboard**: Historical weather trends and pattern analysis
-- **Automated Alerts**: Threshold-based notifications for extreme weather conditions
-- **Data Export**: CSV/JSON export for research and reporting
-- **Batch Device Management**: Multiple device configuration and monitoring
-- **Mobile Access**: Responsive design improvements for field use
-
-**Protocol & Integration Enhancements:**
-
-- **HTTP Support**: REST endpoints for devices without MQTT capability
-- **API Access**: RESTful APIs for third-party integrations
-- **Webhook Support**: Real-time data streaming to external systems
-- **Geographic Mapping**: Weather station location visualization
-- **Automated Reporting**: Scheduled weather summaries and reports
-
-# Current Limitations & Future Roadmap
-
-## Current Platform Limitations
-
 ### Message Format Restrictions
 
 **Current State:**
@@ -1551,21 +1461,6 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 - Limited to weather station use cases only
 - Cannot handle generic IoT sensor data
 - Device compatibility restricted to weather-specific hardware
-
-**Example Supported Format:**
-
-```json
-{
-  "deviceId": "weather-station-001",
-  "timestamp": "2025-01-15T10:30:00Z",
-  "temperature": 22.5,
-  "humidity": 65.2,
-  "pressure": 1013.25,
-  "windSpeed": 5.8,
-  "windDirection": 180,
-  "rainfall": 0.0
-}
-```
 
 ### Protocol Limitations
 
@@ -1619,12 +1514,6 @@ The Weather Platform represents a comprehensive, production-ready IoT solution b
 - Real-time dashboard updates depend on WebSocket connection stability
 - Large historical datasets may impact query performance
 
-### Security Enhancements Needed
-
-- No multi-factor authentication (MFA) implementation
-- Basic role-based access control (platform-admin group only)
-- Limited audit logging for user actions
-
 ### Scalability Concerns
 
 - Manual IoT policy attachment required for each new user
@@ -1656,42 +1545,7 @@ This project demonstrates practical experience with:
 - **Modern Web Development**: Next.js 15, React 19, TypeScript integration
 - **Real-world Constraints**: Working within protocol and device limitations
 - **Infrastructure as Code**: CDK constructs for custom AWS resource management
-- **Authentication Optimization**: Custom JWT validation for performance
-- **Problem-Solving**: Addressing specific lab operational challenges
 - **Documentation**: Comprehensive technical documentation for specialized systems
-
-### Project Success Metrics
-
-**Core Objectives Achieved:**
-
-- **Centralized Management**: Lab personnel can monitor all weather stations from a single dashboard
-- **Automated Data Collection**: Eliminates manual site visits for data retrieval
-- **Real-time Monitoring**: Live weather data and device connectivity status
-- **Scalable Architecture**: Cloud-native design supporting multiple users and devices
-- **Secure Access**: Authentication and authorization for lab personnel
-
-**Technical Achievements:**
-
-- Modern serverless architecture with optimal performance
-- 120x authentication performance improvement over traditional approaches
-- CDK-based infrastructure avoiding circular dependency issues
-- Production-ready deployment pipeline with AWS Amplify
-
-### Current State Assessment
-
-**Strengths:**
-
-- **Specialized Focus**: Optimized specifically for weather station management
-- **Cloud-Native**: Leverages AWS managed services for reliability and scalability
-- **Modern Tech Stack**: Next.js 15, React 19, TypeScript for maintainability
-- **Security**: Robust authentication and IoT device security
-
-**Acknowledged Limitations:**
-
-- **Weather-Only**: Current implementation limited to weather telemetry
-- **MQTTS Only**: Single protocol support restricts device compatibility
-- **Analytics Gap**: Basic data storage without advanced analysis features
-- **Manual Processes**: Some administrative tasks require manual intervention
 
 ### Recommendation for Lab Use
 
@@ -1716,12 +1570,10 @@ This platform represents a **working, specialized solution** rather than a gener
 
 ---
 
-**Documentation Version**: 1.1  
+**Documentation Version**: 1.0  
 **Last Updated**: September 2025  
 **Platform Version**: Next.js 15 + AWS Amplify Gen 2  
 **Author**: PancakesLmao  
 **Use Case**: Itea Lab Weather Station Management
 
 **Current Status**: Production-ready for weather station monitoring with planned enhancements for advanced analytics and expanded protocol support.
-
-For support, feature requests, or contributions, please refer to the project repository and follow the established development workflows.

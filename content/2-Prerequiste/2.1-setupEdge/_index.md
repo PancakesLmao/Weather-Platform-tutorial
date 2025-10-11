@@ -11,7 +11,7 @@ In this step, we'll set up the edge devices that collect weather data and transm
 Edge devices are optional for learning the platform. You can use a script as data simulator for development and testing without physical hardware.
 {{% /notice %}}
 
-![Edge Device Architecture](/images/edge-architecture.jpg)
+![Edge Device Architecture](/images/edge-arch.jpg)
 
 ## Hardware Options
 

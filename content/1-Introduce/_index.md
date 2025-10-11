@@ -15,7 +15,7 @@ The IoT Weather Platform addresses these challenges through a serverless AWS arc
 
 A Next.js web application, hosted on AWS Amplify, provides a user interface for real-time dashboards and trend analysis, with access secured by Amazon Cognito. The system supports multiple weather stations, with scalability to 15, and maintains low operational costs at approximately under $5 per month.
 
-![CloudArchitecture](/images/full-architecture.jpg)
+![CloudArchitecture](/images/full-arch.jpg)
 
 ## Key Features
 

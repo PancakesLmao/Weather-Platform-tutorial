@@ -11,9 +11,8 @@ chapter: false
 This workshop introduces the IoT Weather Platform, a serverless AWS-based solution developed for the ITea Lab in Ho Chi Minh City to enhance weather data collection and analysis for research purposes. The tutorial is designed for lab members and community participants to understand and implement the platform systematically.
 
 The platform is powered by modern tools such as Next.js 15, AWS Amplify Gen 2, IoT Core, and a comprehensive data pipeline that supports both real-time weather monitoring and historical data analysis.
-
-![Overview](/images/arc-log.png)
-
+| ![Overview](/images/20241105_092954.jpg) | ![Overview](/images/20241105_093357.jpg) |
+|:---------------------------------------------------------------:|:---------------------------------------------------------------:|
 ### Content
 
 1. [Introduction](1-introduce/)

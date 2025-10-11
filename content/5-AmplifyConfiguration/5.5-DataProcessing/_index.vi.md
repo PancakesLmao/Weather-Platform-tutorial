@@ -11,7 +11,7 @@ Weather Platform sử dụng AWS Glue để chuyển đổi raw IoT messages th�
 
 ### Processing Flow
 
-![Processing Flow](/images/5-amplifyConfiguration/5.5-data-processing/glue-flow.png)
+![Processing Flow](/images/5-amplifyConfiguration/5.5-data-processing/glue-flow.jpg)
 
 **Orchestration Flow**:
 

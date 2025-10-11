@@ -11,7 +11,7 @@ Trong bước này, chúng ta sẽ thiết lập các thiết bị biên thu th�
 Thiết bị biên là tùy chọn để học platform. Bạn có thể sử dụng script làm data simulator cho development và testing mà không cần phần cứng vật lý.
 {{% /notice %}}
 
-![Edge Device Architecture](/images/edge-architecture.jpg)
+![Edge Device Architecture](/images/edge-arch.jpg)
 
 ## Tùy chọn phần cứng
 
